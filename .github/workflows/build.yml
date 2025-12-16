@@ -1,0 +1,45 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # avoid shallow clone so nbgv can do its work
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Setup NuGet
+        uses: NuGet/setup-nuget@v2
+
+      - name: Nerdbank.GitVersioning
+        uses: dotnet/nbgv@master
+        id: nbgv
+
+      - name: Restore NuGet packages
+        run: nuget restore src/CertViewerVS.csproj -PackagesDirectory packages
+
+      - name: Build
+        run: msbuild src/CertViewerVS.csproj /p:Configuration=Release /p:DeployExtension=false
+
+      - name: Upload VSIX artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: CertViewerVS-${{ steps.nbgv.outputs.SemVer2 }}
+          path: src/bin/Release/**/*.vsix
