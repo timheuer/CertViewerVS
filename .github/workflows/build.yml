@@ -9,7 +9,7 @@ on:
   workflow_call:
     outputs:
       version:
-        description: 'The version of the build'
+        description: "The version of the build"
         value: ${{ jobs.build.outputs.version }}
 
 jobs:
@@ -45,8 +45,14 @@ jobs:
       - name: Build
         run: msbuild src/CertViewerVS.csproj /p:Configuration=Release /p:DeployExtension=false
 
+      - name: Copy VSIX to output
+        shell: pwsh
+        run: |
+          $vsix = Get-ChildItem -Path src/bin/Release -Filter *.vsix -Recurse | Select-Object -First 1
+          Copy-Item $vsix.FullName -Destination "${{ github.event.repository.name }}.vsix"
+
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
         with:
           name: ${{ github.event.repository.name }}.vsix
-          path: src/bin/Release/**/*.vsix
+          path: ${{ github.event.repository.name }}.vsix
