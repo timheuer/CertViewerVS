@@ -33,10 +33,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ github.event.repository.name }}.vsix
+          path: .
 
-      - name: Move VSIX to workspace root
-        run: |
-          move .\${{ github.event.repository.name }}.vsix .
       - name: Tag and Release
         id: tag_release
         uses: softprops/action-gh-release@v1
