@@ -1,0 +1,202 @@
+<DataTemplate xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+              xmlns:vs="http://schemas.microsoft.com/visualstudio/extensibility/2022/xaml">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="15">
+            <!-- No File State -->
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <MultiDataTrigger>
+                                <MultiDataTrigger.Conditions>
+                                    <Condition Binding="{Binding HasData}" Value="False"/>
+                                    <Condition Binding="{Binding HasError}" Value="False"/>
+                                    <Condition Binding="{Binding IsLoading}" Value="False"/>
+                                </MultiDataTrigger.Conditions>
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </MultiDataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="📄" FontSize="48" HorizontalAlignment="Center"/>
+                <TextBlock Text="No certificate file loaded" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="Gray"/>
+                <TextBlock Text="Use Tools > Open Certificate File (Ctrl+Shift+Q)" FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0" Foreground="Gray"/>
+            </StackPanel>
+            
+            <!-- Loading State -->
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,50,0,0">
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsLoading}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                <TextBlock Text="⏳" FontSize="48" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding LoadingMessage}" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0" Foreground="Gray"/>
+                <TextBlock Text="Please wait..." FontSize="12" HorizontalAlignment="Center" Margin="0,5,0,0" Foreground="Gray"/>
+            </StackPanel>
+            
+            <!-- Error State -->
+            <Border Background="#FFEEEE" BorderBrush="#FF6666" BorderThickness="1" CornerRadius="4" Padding="15" Margin="0,10,0,10">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasError}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+                <StackPanel>
+                    <TextBlock Text="Error" FontWeight="Bold" Foreground="#CC0000" FontSize="14"/>
+                    <TextBlock Text="{Binding ErrorMessage}" TextWrapping="Wrap" Foreground="#CC0000" Margin="0,5,0,0"/>
+                </StackPanel>
+            </Border>
+            
+            <!-- Certificate Content -->
+            <StackPanel>
+                <StackPanel.Style>
+                    <Style TargetType="StackPanel">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding HasData}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Style>
+                
+                <!-- File Information Header -->
+                <Border Background="#E3F2FD" CornerRadius="4" Padding="12" Margin="0,0,0,15">
+                    <StackPanel>
+                        <TextBlock Text="{Binding FileName}" FontSize="16" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding CertificateCountText}" FontSize="12" Foreground="Gray" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Certificate List with Expanders -->
+                <ItemsControl ItemsSource="{Binding Certificates}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Expander IsExpanded="{Binding IsExpanded, Mode=TwoWay}" Margin="0,0,0,10">
+                                <Expander.Header>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="{Binding DisplayName}" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                        <TextBlock Text=" - " Foreground="Gray" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding ValidityStatus}" Foreground="{Binding ValidityColor}" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Expander.Header>
+                                <Border Background="#FAFAFA" CornerRadius="0,0,4,4" Padding="15" BorderBrush="#E0E0E0" BorderThickness="1,0,1,1">
+                                    <StackPanel>
+                                        <!-- Certificate Index -->
+                                        <TextBlock Text="{Binding CertIndex}" FontSize="11" Foreground="Gray" Margin="0,0,0,10"/>
+                                        
+                                        <!-- Validity Status -->
+                                        <TextBlock Text="Validity Status" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Border CornerRadius="4" Padding="10" Margin="0,0,0,12" Background="#EEFFEE">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="100"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Status:" FontWeight="SemiBold"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ValidityStatus}" FontWeight="SemiBold" Foreground="{Binding ValidityColor}"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Valid From:" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ValidFrom}" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Valid To:" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ValidTo}" Margin="0,3,0,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Subject -->
+                                        <TextBlock Text="Subject" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Border Background="#F5F5F5" CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                                            <TextBlock Text="{Binding Subject}" TextWrapping="Wrap"/>
+                                        </Border>
+
+                                        <!-- Issuer -->
+                                        <TextBlock Text="Issuer" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Border Background="#F5F5F5" CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                                            <TextBlock Text="{Binding Issuer}" TextWrapping="Wrap"/>
+                                        </Border>
+
+                                        <!-- Certificate Details -->
+                                        <TextBlock Text="Certificate Details" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Border Background="#F5F5F5" CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="130"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Version:" FontWeight="SemiBold"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Version}"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Serial Number:" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SerialNumber}" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Thumbprint:" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Thumbprint}" FontFamily="Consolas" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Signature Alg:" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SignatureAlgorithm}" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Public Key:" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding PublicKey}" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="5" Grid.Column="0" Text="Has Private Key:" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding HasPrivateKey}" Foreground="{Binding HasPrivateKeyColor}" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="6" Grid.Column="0" Text="Friendly Name:" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="6" Grid.Column="1" Text="{Binding FriendlyName}" Margin="0,3,0,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Key Usage -->
+                                        <TextBlock Text="Key Usage" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Border Background="#F5F5F5" CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="130"/>
+                                                    <ColumnDefinition Width="*"/>
+                                                </Grid.ColumnDefinitions>
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto"/>
+                                                    <RowDefinition Height="Auto"/>
+                                                </Grid.RowDefinitions>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Key Usage:" FontWeight="SemiBold"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding KeyUsage}" TextWrapping="Wrap"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Enhanced:" FontWeight="SemiBold" Margin="0,3,0,0"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding EnhancedKeyUsage}" TextWrapping="Wrap" Margin="0,3,0,0"/>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Subject Alternative Names -->
+                                        <TextBlock Text="Subject Alternative Names" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,5"/>
+                                        <Border Background="#F5F5F5" CornerRadius="4" Padding="10">
+                                            <TextBlock Text="{Binding SubjectAltNames}" TextWrapping="Wrap"/>
+                                        </Border>
+                                    </StackPanel>
+                                </Border>
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</DataTemplate>

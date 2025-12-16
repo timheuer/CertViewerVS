@@ -1,0 +1,4 @@
+{
+  "CertViewerVS.CertViewerCommand.DisplayName": "Open Certificate File",
+  "CertViewerVS.CertViewerCommand.TooltipText": "Open and view certificate files (PFX, P12, PEM, CRT, DER, CER)"
+}
