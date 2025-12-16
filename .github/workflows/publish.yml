@@ -1,0 +1,59 @@
+name: "Publish"
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      Command:
+        description: "Publish command"
+
+jobs:
+  build:
+    name: Build and Test
+    uses: ./.github/workflows/build.yml
+
+  publish:
+    needs: build
+    name: Publish
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    env:
+      VERSION: ${{ needs.build.outputs.version }}
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download Package artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ github.event.repository.name }}.vsix
+
+      - name: Tag and Release
+        id: tag_release
+        uses: softprops/action-gh-release@v1
+        with:
+          body: Release ${{ env.VERSION }}
+          tag_name: ${{ env.VERSION }}
+          generate_release_notes: true
+          files: |
+            **/*.vsix
+
+      - name: Upload to VsixGallery
+        uses: timheuer/openvsixpublish@v1
+        with:
+          vsix-file: ${{ github.event.repository.name }}.vsix
+
+      - name: Publish extension to Marketplace
+        id: publish_vsix
+        if: ${{ (github.event_name == 'push' && contains(github.event.head_commit.message, '[release]')) || (github.event_name == 'workflow_dispatch' && contains(github.event.inputs.Command, '[release]')) }}
+        uses: cezarypiatek/VsixPublisherAction@1.1
+        with:
+          extension-file: "${{ github.event.repository.name }}.vsix"
+          publish-manifest-file: "vs-publish.json"
+          personal-access-code: ${{ secrets.VSCE_PAT }}

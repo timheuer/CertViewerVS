@@ -1,10 +1,17 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="CertViewerVS.a3450f25-0591-4165-8a6b-97191f1fd30f" Version="|%CurrentProject%;GetBuildVersion|" Language="en-US" Publisher="Publisher name" />
+    <Identity Id="CertViewerVS.a3450f25-0591-4165-8a6b-97191f1fd30f" Version="|%CurrentProject%;GetBuildVersion|" Language="en-US" Publisher="Tim Heuer" />
     <DisplayName>Cert Viewer for VS</DisplayName>
     <Description>A certificate metadata viewer for PFX/CER/CRT/PEM/CRT files.</Description>
     <Preview>true</Preview>
+    <License>License.txt</License>
+    <Icon>Resources\Icon.png</Icon>
+    <MoreInfo>https://github.com/timheuer/CertViewerVS</MoreInfo>
+    <Tags>certificates;ssl;tls;security;viewer;pfx;cer;crt;pem</Tags>
+    <Properties>
+            <Property Id="Microsoft.VisualStudio.Services.Links.Support" Value="https://github.com/timheuer/CertViewerVS/issues" />
+        </Properties>
   </Metadata>
   <Installation ExtensionType="VSSDK+VisualStudio.Extensibility">
     <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.14,)">

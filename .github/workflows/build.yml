@@ -6,10 +6,17 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  workflow_call:
+    outputs:
+      version:
+        description: 'The version of the build'
+        value: ${{ jobs.build.outputs.version }}
 
 jobs:
   build:
     runs-on: windows-latest
+    outputs:
+      version: ${{ steps.nbgv.outputs.SemVer2 }}
 
     steps:
       - name: Checkout
@@ -41,5 +48,5 @@ jobs:
       - name: Upload VSIX artifact
         uses: actions/upload-artifact@v4
         with:
-          name: CertViewerVS-${{ steps.nbgv.outputs.SemVer2 }}
+          name: ${{ github.event.repository.name }}.vsix
           path: src/bin/Release/**/*.vsix
