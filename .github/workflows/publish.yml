@@ -30,7 +30,7 @@ jobs:
           fetch-depth: 0
 
       - name: Download Package artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: ${{ github.event.repository.name }}.vsix
           path: .
