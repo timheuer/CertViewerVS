@@ -25,7 +25,7 @@ jobs:
       VERSION: ${{ needs.build.outputs.version }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -37,7 +37,7 @@ jobs:
 
       - name: Tag and Release
         id: tag_release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           body: Release ${{ env.VERSION }}
           tag_name: ${{ env.VERSION }}
